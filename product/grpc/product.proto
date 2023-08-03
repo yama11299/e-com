@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package product;
+
+option go_package = "/grpc";
+
+service Product {
+    rpc Get(GetRequest) returns (GetResponse);
+    rpc List(ListRequest) returns (ListResponse);
+    rpc UpdateQuantity(UpdateQuantityRequest) returns (UpdateQuantityResponse);
+}
+
+message GetRequest {
+    int32 id = 1;
+}
+
+message GetResponse {
+    int32 id  = 1;
+    string name = 2;
+    int32 price = 3;
+    string category = 4;
+    int32 available_quantity = 5;
+}
+
+message ListRequest{
+   repeated int32 ids = 1; 
+}
+
+message ListResponse {
+    repeated GetResponse products = 1;
+}
+
+message UpdateQuantityRequest {
+    int32 id = 1;
+    int32 quantity = 2;
+}
+
+message UpdateQuantityResponse {}
