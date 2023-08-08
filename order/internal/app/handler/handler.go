@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/yamadev11/e-com/order/internal/app/bl"
+	"github.com/yama11299/e-com/order/internal/app/bl"
 )
 
 // CreateOrder handler for CreateOrder API

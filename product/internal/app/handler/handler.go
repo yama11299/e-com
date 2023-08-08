@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/yamadev11/e-com/product/internal/app/bl"
+	"github.com/yama11299/e-com/product/internal/app/bl"
 )
 
 // List handler to the product List API

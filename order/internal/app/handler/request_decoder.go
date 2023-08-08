@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/yamadev11/e-com/order/internal/app/spec"
+	"github.com/yama11299/e-com/order/internal/app/spec"
 )
 
 func decodeCreateOrderRequest(r *http.Request) (spec.CreateOrderRequest, error) {

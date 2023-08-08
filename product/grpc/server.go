@@ -5,8 +5,8 @@ import (
 	"log"
 	"net"
 
-	"github.com/yamadev11/e-com/product/internal/app/bl"
-	"github.com/yamadev11/e-com/product/internal/app/spec"
+	"github.com/yama11299/e-com/product/internal/app/bl"
+	"github.com/yama11299/e-com/product/internal/app/spec"
 	grpc "google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

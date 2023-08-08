@@ -5,9 +5,9 @@ import (
 	"errors"
 	"log"
 
-	"github.com/yamadev11/e-com/order/internal/app/bl/dl"
-	"github.com/yamadev11/e-com/order/internal/app/spec"
-	productGRPC "github.com/yamadev11/e-com/product/grpc"
+	"github.com/yama11299/e-com/order/internal/app/bl/dl"
+	"github.com/yama11299/e-com/order/internal/app/spec"
+	productGRPC "github.com/yama11299/e-com/product/grpc"
 )
 
 // DL ...

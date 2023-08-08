@@ -6,7 +6,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
-	"github.com/yamadev11/e-com/product/internal/app/spec"
+	"github.com/yama11299/e-com/product/internal/app/spec"
 )
 
 const (

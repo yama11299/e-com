@@ -12,11 +12,11 @@ import (
 	"github.com/gorilla/mux"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/yamadev11/e-com/product/grpc"
-	"github.com/yamadev11/e-com/product/internal/app/bl"
-	"github.com/yamadev11/e-com/product/internal/app/bl/dl"
-	"github.com/yamadev11/e-com/product/internal/app/handler"
-	"github.com/yamadev11/e-com/product/internal/app/spec"
+	"github.com/yama11299/e-com/product/grpc"
+	"github.com/yama11299/e-com/product/internal/app/bl"
+	"github.com/yama11299/e-com/product/internal/app/bl/dl"
+	"github.com/yama11299/e-com/product/internal/app/handler"
+	"github.com/yama11299/e-com/product/internal/app/spec"
 )
 
 func main() {

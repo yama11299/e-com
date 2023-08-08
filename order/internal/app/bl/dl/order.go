@@ -7,7 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
-	"github.com/yamadev11/e-com/order/internal/app/spec"
+	"github.com/yama11299/e-com/order/internal/app/spec"
 )
 
 // Order status constants

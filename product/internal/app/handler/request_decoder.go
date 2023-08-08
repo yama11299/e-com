@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yamadev11/e-com/product/internal/app/spec"
+	"github.com/yama11299/e-com/product/internal/app/spec"
 )
 
 func decodeListRequest(r *http.Request) (spec.ListRequest, error) {

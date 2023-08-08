@@ -11,11 +11,11 @@ import (
 
 	"github.com/gorilla/mux"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/yamadev11/e-com/order/internal/app/bl"
-	"github.com/yamadev11/e-com/order/internal/app/bl/dl"
-	"github.com/yamadev11/e-com/order/internal/app/handler"
-	"github.com/yamadev11/e-com/order/internal/app/spec"
-	productGRPC "github.com/yamadev11/e-com/product/grpc"
+	"github.com/yama11299/e-com/order/internal/app/bl"
+	"github.com/yama11299/e-com/order/internal/app/bl/dl"
+	"github.com/yama11299/e-com/order/internal/app/handler"
+	"github.com/yama11299/e-com/order/internal/app/spec"
+	productGRPC "github.com/yama11299/e-com/product/grpc"
 	"google.golang.org/grpc"
 )
 
