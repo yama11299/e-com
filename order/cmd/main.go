@@ -52,6 +52,7 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc(spec.CreateOrderPath, handler.CreateOrder(bl)).Methods(http.MethodPost)
+	router.HandleFunc(spec.GetOrderPath, handler.GetOrder(bl)).Methods(http.MethodGet)
 
 	// start server
 	go func() {

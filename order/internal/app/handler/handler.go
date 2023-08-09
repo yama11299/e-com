@@ -29,6 +29,27 @@ func CreateOrder(svc bl.BL) func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetOrder handler for GetOrder API
+func GetOrder(svc bl.BL) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		// request decoder
+		orderID, err := decodeGetOrderRequest(r)
+		if err != nil {
+			jsonEncodeAPIResponse(ctx, w, err)
+			return
+		}
+
+		order, err := svc.Get(ctx, orderID)
+		if err != nil {
+			jsonEncodeAPIResponse(ctx, w, err)
+			return
+		}
+
+		jsonEncodeAPIResponse(ctx, w, order)
+	}
+}
+
 func jsonEncodeAPIResponse(ctx context.Context, w http.ResponseWriter, resp interface{}) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 

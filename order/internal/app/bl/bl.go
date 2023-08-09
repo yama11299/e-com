@@ -13,11 +13,14 @@ import (
 // DL ...
 type DL interface {
 	Create(ctx context.Context, order *spec.Order, orderItems []spec.OrderItem) (*spec.Order, error)
+	GetOrderItems(ctx context.Context, orderID int) ([]spec.OrderItem, error)
+	GetOrder(ctx context.Context, orderID int) (spec.Order, error)
 }
 
 // BL the order service interface
 type BL interface {
 	Create(ctx context.Context, req spec.CreateOrderRequest) (spec.GetResponse, error)
+	Get(ctx context.Context, orderID int) (spec.GetResponse, error)
 }
 
 type bl struct {
@@ -151,4 +154,31 @@ func (svc *bl) restoreProductQuantity(ctx context.Context, products map[int]*pro
 	}
 
 	return nil
+}
+
+func (svc *bl) Get(ctx context.Context, orderID int) (spec.GetResponse, error) {
+
+	var response spec.GetResponse
+	order, err := svc.dl.GetOrder(ctx, orderID)
+	if err != nil {
+		return response, err
+	}
+
+	orderItems, err := svc.dl.GetOrderItems(ctx, orderID)
+	if err != nil {
+		return response, err
+	}
+
+	response = spec.GetResponse{
+		ID:           order.ID,
+		Items:        orderItems,
+		Amount:       order.Amount,
+		Discount:     order.Discount,
+		FinalAmount:  order.FinalAmount,
+		Status:       dl.OrderStatusMap[order.Status],
+		OrderDate:    order.OrderDate,
+		DispatchDate: order.DispatchDate,
+	}
+
+	return response, nil
 }

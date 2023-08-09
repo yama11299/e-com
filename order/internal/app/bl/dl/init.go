@@ -22,7 +22,7 @@ func InitDB() (*sqlx.DB, error) {
 		final_amount INTEGER NOT NULL,
 		status INTEGER NOT NULL,
 		order_date TEXT NOT NULL,
-		dispatch_date TEXT,
+		dispatch_date TEXT NOT NULL,
 		created_at INTEGER NOT NULL,
 		updated_at INTEGER NOT NULL
 	);`
@@ -31,6 +31,8 @@ func InitDB() (*sqlx.DB, error) {
 		id INTEGER PRIMARY KEY ASC,
 		order_id INTEGER NOT NULL,
 		product_id INTEGER NOT NULL,
+		name TEXT NOT NULL,
+		price INTEGER NOT NULL,
 		quantity INTEGER NOT NULL
 	)`
 

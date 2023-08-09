@@ -6,8 +6,8 @@ type GetResponse struct {
 	Items        []OrderItem `json:"order_items"`
 	Amount       float64     `json:"amount"`
 	Discount     float64     `json:"discount"`
-	FinalAmount  float64     `json:"finalAmount"`
+	FinalAmount  float64     `json:"final_amount"`
 	Status       string      `json:"status"`
-	OrderDate    string      `json:"orderDate"`
-	DispatchDate string      `json:"dispatchDate,omitempty"`
+	OrderDate    string      `json:"order_date"`
+	DispatchDate string      `json:"dispatch_date,omitempty"`
 }

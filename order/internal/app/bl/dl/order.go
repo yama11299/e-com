@@ -34,6 +34,9 @@ var (
 		Cancelled:  "Cancelled",
 		Returned:   "Returned",
 	}
+
+	orderTableColumns      = []string{"id", "amount", "discount", "final_amount", "status", "order_date", "dispatch_date"}
+	orderItemsTableColumns = []string{"order_id", "product_id", "name", "price", "quantity"}
 )
 
 type orderDL struct {
@@ -55,13 +58,14 @@ func (dl *orderDL) Create(ctx context.Context, order *spec.Order, items []spec.O
 	order.FinalAmount = order.Amount - order.Discount
 
 	newOrder := map[string]interface{}{
-		"amount":       order.Amount,
-		"discount":     order.Discount,
-		"final_amount": order.FinalAmount,
-		"status":       order.Status,
-		"order_date":   order.OrderDate,
-		"created_at":   currentTime.Unix(),
-		"updated_at":   currentTime.Unix(),
+		"amount":        order.Amount,
+		"discount":      order.Discount,
+		"final_amount":  order.FinalAmount,
+		"status":        order.Status,
+		"order_date":    order.OrderDate,
+		"dispatch_date": "",
+		"created_at":    currentTime.Unix(),
+		"updated_at":    currentTime.Unix(),
 	}
 
 	q := sq.Insert(orderTable).SetMap(newOrder).Suffix("RETURNING id")
@@ -98,10 +102,10 @@ func (dl *orderDL) Create(ctx context.Context, order *spec.Order, items []spec.O
 // CreateOrderItem creates entry for order items
 func (dl *orderDL) CreateOrderItems(ctx context.Context, orderID int, items []spec.OrderItem, tx *sqlx.Tx) error {
 
-	q := sq.Insert(orderItemsTable).Columns("order_id", "product_id", "quantity")
+	q := sq.Insert(orderItemsTable).Columns("order_id", "product_id", "name", "price", "quantity")
 
 	for _, item := range items {
-		q = q.Values(orderID, item.ProductID, item.Quantity)
+		q = q.Values(orderID, item.ProductID, item.Name, item.Price, item.Quantity)
 	}
 
 	query, args, err := q.ToSql()
@@ -115,4 +119,51 @@ func (dl *orderDL) CreateOrderItems(ctx context.Context, orderID int, items []sp
 	}
 
 	return nil
+}
+
+func (dl *orderDL) GetOrder(ctx context.Context, orderID int) (spec.Order, error) {
+
+	response := spec.Order{}
+
+	q := sq.Select(orderTableColumns...).From(orderTable).Where(sq.Eq{"id": orderID})
+	query, args, err := q.ToSql()
+	if err != nil {
+		return response, err
+	}
+
+	result := dl.db.QueryRowx(query, args...)
+	err = result.StructScan(&response)
+	if err != nil {
+		return response, err
+	}
+
+	return response, nil
+}
+
+func (dl *orderDL) GetOrderItems(ctx context.Context, orderID int) ([]spec.OrderItem, error) {
+	response := []spec.OrderItem{}
+
+	q := sq.Select(orderItemsTableColumns...).From(orderItemsTable).Where(sq.Eq{"order_id": orderID})
+
+	query, args, err := q.ToSql()
+	if err != nil {
+		return response, err
+	}
+
+	rows, err := dl.db.Queryx(query, args...)
+	if err != nil {
+		return response, err
+	}
+
+	orderItem := spec.OrderItem{}
+	for rows.Next() {
+		err = rows.StructScan(&orderItem)
+		if err != nil {
+			return response, err
+		}
+
+		response = append(response, orderItem)
+	}
+
+	return response, nil
 }
