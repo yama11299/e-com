@@ -18,7 +18,7 @@ func decodeCreateOrderRequest(r *http.Request) (spec.CreateOrderRequest, error) 
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&request)
 	if err != nil {
-		fmt.Println("failed to decode request", err.Error())
+		fmt.Println("failed to decode request body", err.Error())
 		return request, err
 	}
 
@@ -33,6 +33,26 @@ func decodeGetOrderRequest(r *http.Request) (int, error) {
 	}
 
 	return orderID, nil
+}
+
+func decodeUpdateOrderStatusRequest(r *http.Request) (spec.UpdateOrderStatusRequest, error) {
+
+	request := spec.UpdateOrderStatusRequest{}
+
+	orderID, err := getOrderID(r)
+	if err != nil {
+		return request, err
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&request)
+	if err != nil {
+		fmt.Println("failed to decode request body", err.Error())
+		return request, err
+	}
+
+	request.OrderID = orderID
+	return request, nil
 }
 
 func getOrderID(r *http.Request) (int, error) {

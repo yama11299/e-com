@@ -50,6 +50,27 @@ func GetOrder(svc bl.BL) func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UpdateOrderStatusHandler handler for UpdateOrderStatus API
+func UpdateOrderStatusHandler(svc bl.BL) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		// request decoder
+		request, err := decodeUpdateOrderStatusRequest(r)
+		if err != nil {
+			jsonEncodeAPIResponse(ctx, w, err)
+			return
+		}
+
+		order, err := svc.UpdateStatus(ctx, request)
+		if err != nil {
+			jsonEncodeAPIResponse(ctx, w, err)
+			return
+		}
+
+		jsonEncodeAPIResponse(ctx, w, order)
+	}
+}
+
 func jsonEncodeAPIResponse(ctx context.Context, w http.ResponseWriter, resp interface{}) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 

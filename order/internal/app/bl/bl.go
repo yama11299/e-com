@@ -3,6 +3,7 @@ package bl
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/yama11299/e-com/order/internal/app/bl/dl"
@@ -15,12 +16,14 @@ type DL interface {
 	Create(ctx context.Context, order *spec.Order, orderItems []spec.OrderItem) (*spec.Order, error)
 	GetOrderItems(ctx context.Context, orderID int) ([]spec.OrderItem, error)
 	GetOrder(ctx context.Context, orderID int) (spec.Order, error)
+	UpdateStatus(ctx context.Context, req spec.UpdateOrderStatusRequest) error
 }
 
 // BL the order service interface
 type BL interface {
 	Create(ctx context.Context, req spec.CreateOrderRequest) (spec.GetResponse, error)
 	Get(ctx context.Context, orderID int) (spec.GetResponse, error)
+	UpdateStatus(ctx context.Context, req spec.UpdateOrderStatusRequest) (string, error)
 }
 
 type bl struct {
@@ -180,5 +183,30 @@ func (svc *bl) Get(ctx context.Context, orderID int) (spec.GetResponse, error) {
 		DispatchDate: order.DispatchDate,
 	}
 
+	return response, nil
+}
+
+// UpdateStatus updates order status
+func (svc *bl) UpdateStatus(ctx context.Context, req spec.UpdateOrderStatusRequest) (string, error) {
+	var response string
+
+	// get order details
+	order, err := svc.dl.GetOrder(ctx, req.OrderID)
+	if err != nil {
+		return response, err
+	}
+
+	// validate status
+	if order.Status == dl.Cancelled || order.Status == dl.Returned || order.Status >= req.Status {
+		return response, errors.New("couldn't update order status, invalid status provided")
+	}
+
+	// update status
+	err = svc.dl.UpdateStatus(ctx, req)
+	if err != nil {
+		return response, err
+	}
+
+	response = fmt.Sprintf("updated status as %s for order id %d", dl.OrderStatusMap[req.Status], req.OrderID)
 	return response, nil
 }

@@ -53,6 +53,7 @@ func main() {
 
 	router.HandleFunc(spec.CreateOrderPath, handler.CreateOrder(bl)).Methods(http.MethodPost)
 	router.HandleFunc(spec.GetOrderPath, handler.GetOrder(bl)).Methods(http.MethodGet)
+	router.HandleFunc(spec.UpdateOrderStatusPath, handler.UpdateOrderStatusHandler(bl)).Methods(http.MethodPatch)
 
 	// start server
 	go func() {

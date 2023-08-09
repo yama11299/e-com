@@ -14,8 +14,8 @@ import (
 const (
 	Placed = iota + 1
 	Dispatched
-	Completed
 	Cancelled
+	Delivered
 	Returned
 )
 
@@ -30,8 +30,8 @@ var (
 	OrderStatusMap = map[int]string{
 		Placed:     "Placed",
 		Dispatched: "Dispatched",
-		Completed:  "Completed",
 		Cancelled:  "Cancelled",
+		Delivered:  "Delivered",
 		Returned:   "Returned",
 	}
 
@@ -166,4 +166,34 @@ func (dl *orderDL) GetOrderItems(ctx context.Context, orderID int) ([]spec.Order
 	}
 
 	return response, nil
+}
+
+// UpdateStatus updates order status
+func (dl *orderDL) UpdateStatus(ctx context.Context, req spec.UpdateOrderStatusRequest) error {
+
+	currentTime := time.Now()
+	y, m, d := time.Now().Date()
+	date := fmt.Sprintf("%d/%d/%d", d, m, y)
+
+	q := sq.Update(orderTable).
+		Set("status", req.Status).
+		Set("updated_at", currentTime.Unix()).
+		Where(sq.Eq{"id": req.OrderID}).Suffix("RETURNING id")
+
+	if req.Status == Dispatched {
+		q = q.Set("dispatch_date", date)
+	}
+
+	query, args, err := q.ToSql()
+	if err != nil {
+		return err
+	}
+
+	var updatedOrderID int
+	err = dl.db.QueryRowx(query, args...).Scan(&updatedOrderID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
