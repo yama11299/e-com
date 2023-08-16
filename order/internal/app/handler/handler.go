@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"github.com/yama11299/e-com/order/internal/app/bl"
+	"github.com/yama11299/e-com/order/internal/app/bl/dl"
+	"github.com/yama11299/e-com/order/internal/app/spec"
 )
 
 // CreateOrder handler for CreateOrder API
@@ -62,6 +64,56 @@ func UpdateOrderStatusHandler(svc bl.BL) func(w http.ResponseWriter, r *http.Req
 		}
 
 		order, err := svc.UpdateStatus(ctx, request)
+		if err != nil {
+			jsonEncodeAPIResponse(ctx, w, err)
+			return
+		}
+
+		jsonEncodeAPIResponse(ctx, w, order)
+	}
+}
+
+// CancelOrder handler for CancelOrder API
+func CancelOrder(svc bl.BL) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		// request decoder
+		orderID, err := getOrderID(r)
+		if err != nil {
+			jsonEncodeAPIResponse(ctx, w, err)
+			return
+		}
+
+		request := spec.UpdateOrderStatusRequest{
+			OrderID: orderID,
+			Status:  dl.Cancelled,
+		}
+		order, err := svc.CancelAndReturnOrder(ctx, request)
+		if err != nil {
+			jsonEncodeAPIResponse(ctx, w, err)
+			return
+		}
+
+		jsonEncodeAPIResponse(ctx, w, order)
+	}
+}
+
+// ReturnOrder handler for ReturnOrder API
+func ReturnOrder(svc bl.BL) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		// request decoder
+		orderID, err := getOrderID(r)
+		if err != nil {
+			jsonEncodeAPIResponse(ctx, w, err)
+			return
+		}
+
+		request := spec.UpdateOrderStatusRequest{
+			OrderID: orderID,
+			Status:  dl.Returned,
+		}
+		order, err := svc.CancelAndReturnOrder(ctx, request)
 		if err != nil {
 			jsonEncodeAPIResponse(ctx, w, err)
 			return

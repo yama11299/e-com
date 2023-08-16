@@ -12,11 +12,11 @@ import (
 	"github.com/gorilla/mux"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/yama11299/e-com/product/grpc"
 	"github.com/yama11299/e-com/product/internal/app/bl"
 	"github.com/yama11299/e-com/product/internal/app/bl/dl"
 	"github.com/yama11299/e-com/product/internal/app/handler"
 	"github.com/yama11299/e-com/product/internal/app/spec"
+	"github.com/yama11299/e-com/product/pb"
 )
 
 func main() {
@@ -53,7 +53,7 @@ func main() {
 	}()
 
 	go func() {
-		_ = grpc.StartRPCServer(bl)
+		_ = pb.StartRPCServer(bl)
 	}()
 
 	errs := make(chan error)

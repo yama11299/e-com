@@ -15,7 +15,7 @@ import (
 	"github.com/yama11299/e-com/order/internal/app/bl/dl"
 	"github.com/yama11299/e-com/order/internal/app/handler"
 	"github.com/yama11299/e-com/order/internal/app/spec"
-	productGRPC "github.com/yama11299/e-com/product/grpc"
+	productGRPC "github.com/yama11299/e-com/product/pb"
 	"google.golang.org/grpc"
 )
 
@@ -54,6 +54,8 @@ func main() {
 	router.HandleFunc(spec.CreateOrderPath, handler.CreateOrder(bl)).Methods(http.MethodPost)
 	router.HandleFunc(spec.GetOrderPath, handler.GetOrder(bl)).Methods(http.MethodGet)
 	router.HandleFunc(spec.UpdateOrderStatusPath, handler.UpdateOrderStatusHandler(bl)).Methods(http.MethodPatch)
+	router.HandleFunc(spec.CancelOrderPath, handler.CancelOrder(bl)).Methods(http.MethodPatch)
+	router.HandleFunc(spec.ReturnOrderPath, handler.ReturnOrder(bl)).Methods(http.MethodPatch)
 
 	// start server
 	go func() {

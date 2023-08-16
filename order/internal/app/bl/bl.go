@@ -8,7 +8,7 @@ import (
 
 	"github.com/yama11299/e-com/order/internal/app/bl/dl"
 	"github.com/yama11299/e-com/order/internal/app/spec"
-	productGRPC "github.com/yama11299/e-com/product/grpc"
+	productGRPC "github.com/yama11299/e-com/product/pb"
 )
 
 // DL ...
@@ -24,6 +24,7 @@ type BL interface {
 	Create(ctx context.Context, req spec.CreateOrderRequest) (spec.GetResponse, error)
 	Get(ctx context.Context, orderID int) (spec.GetResponse, error)
 	UpdateStatus(ctx context.Context, req spec.UpdateOrderStatusRequest) (string, error)
+	CancelAndReturnOrder(ctx context.Context, req spec.UpdateOrderStatusRequest) (string, error)
 }
 
 type bl struct {
@@ -208,5 +209,78 @@ func (svc *bl) UpdateStatus(ctx context.Context, req spec.UpdateOrderStatusReque
 	}
 
 	response = fmt.Sprintf("updated status as %s for order id %d", dl.OrderStatusMap[req.Status], req.OrderID)
+	return response, nil
+}
+
+// CancelAndReturnOrder sets order status as cancelled or returned
+func (svc *bl) CancelAndReturnOrder(ctx context.Context, req spec.UpdateOrderStatusRequest) (string, error) {
+	var response string
+
+	// get order details
+	order, err := svc.dl.GetOrder(ctx, req.OrderID)
+	if err != nil {
+		return response, err
+	}
+
+	// validate status
+	if req.Status == dl.Returned && order.Status != dl.Delivered {
+		return response, errors.New("couldn't update order status, invalid status provided")
+	}
+
+	if order.Status == dl.Cancelled || order.Status >= req.Status {
+		return response, errors.New("couldn't update order status, invalid status provided")
+	}
+
+	// get order items to update their available quantity in product service
+	orderItems, err := svc.dl.GetOrderItems(ctx, order.ID)
+	if err != nil {
+		return response, err
+	}
+
+	ids := make([]int32, len(orderItems))
+	for _, item := range orderItems {
+		ids = append(ids, int32(item.ProductID))
+	}
+
+	listProductResponse, err := svc.product.List(ctx, &productGRPC.ListRequest{Ids: ids})
+	if err != nil {
+		return response, err
+	}
+
+	// create a map for better performance
+	productMap := map[int]*productGRPC.GetResponse{}
+	for _, product := range listProductResponse.Products {
+		productMap[int(product.Id)] = product
+	}
+
+	for _, item := range orderItems {
+		product := productMap[item.ProductID]
+		product.AvailableQuantity += int32(item.Quantity)
+
+		updateQuantityReq := &productGRPC.UpdateQuantityRequest{
+			Id:       product.Id,
+			Quantity: product.AvailableQuantity,
+		}
+
+		_, err = svc.product.UpdateQuantity(ctx, updateQuantityReq)
+		if err != nil {
+			return response, err
+		}
+	}
+
+	// update status
+	updateStatusReq := spec.UpdateOrderStatusRequest{
+		OrderID: order.ID,
+		Status:  req.Status,
+	}
+
+	err = svc.dl.UpdateStatus(ctx, updateStatusReq)
+	if err != nil {
+		return response, err
+	}
+
+	response = fmt.Sprintf("updated status as %s for order id %d",
+		dl.OrderStatusMap[updateStatusReq.Status], updateStatusReq.OrderID)
+
 	return response, nil
 }
